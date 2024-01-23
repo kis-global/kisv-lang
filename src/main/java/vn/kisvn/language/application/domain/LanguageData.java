@@ -57,7 +57,8 @@ public class LanguageData {
             URL url = new URL(jsonPath);
             JSONObject jsonObject = getJson(url);
             for (String key : jsonObject.keySet()) {
-                value.put(key, jsonObject.getString(key));
+                String val = jsonObject.optString(key, null);
+                value.put(key, val);
             }
         } catch (Exception e) {
 //            value.put("ErrorReadingJson" , e.toString());
