@@ -4,6 +4,7 @@
     implementation 'vn.kisvn.language:kisv-language:0.1.2-20240123.042142-1'
 
 - configuration
+  ```
   @Configuration
   @RequiredArgsConstructor
   public class LanguageConfiguration {
@@ -20,8 +21,11 @@
   				return new LanguageService(namespaceList , environment);
       }
   }
+```
 
 - 서비스 사용
+
+```
   @RequiredArgsConstructor
   public class SomeService {
   
@@ -33,3 +37,4 @@
           Set<String> COMMON_KEYSET = languageService.getKeyset("common" , "en");
       }
   }
+```
