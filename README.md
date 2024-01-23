@@ -1,14 +1,15 @@
-# Project Name
+# kisv-lang
 
-This README provides guidance on setting up and using the KisVN Language Library in your project.
+Language Process Module
 
 ## Nexus Repositories
-We have the library hosted on two Nexus repositories. You can use either of them as per your network accessibility and preference.
 
 1. Nexus Repository - 172.20.1.29:
+   
    implementation 'vn.kisvn.language:kisv-language:0.1.2-20231222.084007-1'
 
-2. Nexus Repository - 172.71.11.47:
+3. Nexus Repository - 172.71.11.47:
+
    implementation 'vn.kisvn.language:kisv-language:0.1.2-20240123.042142-1'
 
 ## Configuration
