@@ -4,13 +4,9 @@ Language Process Module
 
 ## Nexus Repositories
 
-1. Nexus Repository - 172.20.1.29:
-   
-   implementation 'vn.kisvn.language:kisv-language:0.1.2-20231222.084007-1'
+Nexus Repository - 172.71.11.47:8080:
 
-3. Nexus Repository - 172.71.11.47:
-
-   implementation 'vn.kisvn.language:kisv-language:0.1.2-20240123.042142-1'
+   implementation 'vn.kisvn.language:kisv-language:0.1.3-20240123.064714-1'
 
 ## Configuration
 To configure the language service in your application, define a configuration class as shown below:
