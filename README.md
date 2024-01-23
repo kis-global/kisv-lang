@@ -1,40 +1,46 @@
-- 넥서스 (http://172.20.1.29:8088)
-    implementation 'vn.kisvn.language:kisv-language:0.1.2-20231222.084007-1'
-- 넥서스 (http://172.71.11.47:8088/)
-    implementation 'vn.kisvn.language:kisv-language:0.1.2-20240123.042142-1'
+# Project Name
 
-- configuration
-  ```
-  @Configuration
-  @RequiredArgsConstructor
-  public class LanguageConfiguration {
-  		
-  		// 환경별 다른 s3경로 데이터 사용
-      private final Environment environment;
-      
-  		@Bean
-      public LanguageService languageService(){
-  
-  				// 사용하는 namespace 리스트 생성.
-          List<String> namespaceList =  Arrays.asList("common");
-          
-  				return new LanguageService(namespaceList , environment);
-      }
-  }
-```
+This README provides guidance on setting up and using the KisVN Language Library in your project.
 
-- 서비스 사용
+## Nexus Repositories
+We have the library hosted on two Nexus repositories. You can use either of them as per your network accessibility and preference.
 
+1. Nexus Repository - 172.20.1.29:
+   implementation 'vn.kisvn.language:kisv-language:0.1.2-20231222.084007-1'
+
+2. Nexus Repository - 172.71.11.47:
+   implementation 'vn.kisvn.language:kisv-language:0.1.2-20240123.042142-1'
+
+## Configuration
+To configure the language service in your application, define a configuration class as shown below:
 ```
-  @RequiredArgsConstructor
-  public class SomeService {
-  
-      private final LanguageService languageService;
-  
-      public void test(){
-  				// namespace : "common", lanaguage : "en", key value : "Delete"
-          String COMMON_DELETE_EN = languageService.getVal("common","en","Delete");
-          Set<String> COMMON_KEYSET = languageService.getKeyset("common" , "en");
-      }
-  }
+@Configuration
+@RequiredArgsConstructor
+public class LanguageConfiguration {
+    private final Environment environment;
+
+    @Bean
+    public LanguageService languageService() {
+        // Define the namespace list to be used.
+        List<String> namespaceList = Arrays.asList("common");
+        return new LanguageService(namespaceList, environment);
+    }
+}
 ```
+## Using the Service
+To use the LanguageService in your application, follow the example provided below:
+```
+@RequiredArgsConstructor
+public class SomeService {
+    private final LanguageService languageService;
+
+    public void test() {
+        // Retrieve a value using namespace "common", language "en", and key "Delete"
+        String COMMON_DELETE_EN = languageService.getVal("common", "en", "Delete");
+        
+        // Get the set of keys for the specified namespace and language
+        Set<String> COMMON_KEYSET = languageService.getKeyset("common", "en");
+    }
+}
+```
+Ensure that your application has access to the specified Nexus repositories and the environment is properly set up to use the `LanguageService` class effectively.
