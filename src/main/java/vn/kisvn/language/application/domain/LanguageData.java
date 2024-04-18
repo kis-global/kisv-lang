@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
@@ -13,6 +14,7 @@ import java.util.HashMap;
 
 @Getter
 @Setter
+@Slf4j
 @ToString
 public class LanguageData {
 
@@ -22,7 +24,7 @@ public class LanguageData {
 
     private String basePath;
     @Builder
-    public LanguageData(String namespace , String env) {
+    public LanguageData(String namespace , String env) throws Exception{
         this.namespace = namespace;
         this.values = new HashMap<>();
         this.basePath = setBaseUrlByEnv(env);
@@ -51,7 +53,7 @@ public class LanguageData {
     }
 
 
-    private static HashMap<String,String> getValuesFromURI(String jsonPath){
+    private static HashMap<String,String> getValuesFromURI(String jsonPath) throws Exception{
         HashMap<String, String> value = new HashMap<>();
         try {
             URL url = new URL(jsonPath);
@@ -61,7 +63,8 @@ public class LanguageData {
                 value.put(key, val);
             }
         } catch (Exception e) {
-//            value.put("ErrorReadingJson" , e.toString());
+            log.info("Failed to read url " +  jsonPath + " : "  + e.getMessage());
+            throw e;
         }
         return value;
     }

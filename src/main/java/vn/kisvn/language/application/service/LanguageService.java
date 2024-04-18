@@ -1,5 +1,6 @@
 package vn.kisvn.language.application.service;
 
+import lombok.extern.slf4j.Slf4j;
 import vn.kisvn.language.application.domain.LanguageData;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import vn.kisvn.language.application.domain.Lang;
 
 import java.util.*;
 
+@Slf4j
 @Service
 public class LanguageService {
 
@@ -21,6 +23,7 @@ public class LanguageService {
     @Getter
     public List<LanguageData> languageData = new ArrayList<>();
 
+    private boolean isInitialized = false;
 
     @Autowired
     public LanguageService( List<String> namespaceList , Environment env) {
@@ -30,7 +33,8 @@ public class LanguageService {
         this.namespaceList = ( namespaceList != null
                 && namespaceList.size() > 0)?
                 namespaceList : Arrays.asList("common");
-        updateLanguageData();
+        log.info("name space list : "  + this.namespaceList);
+        initLanguageData();
     }
 
     public String getVal(String namespace, String lang , String key ){
@@ -69,16 +73,70 @@ public class LanguageService {
         return Collections.emptySet();
     }
 
-    @Scheduled(cron = "0 0 */2 * * *")
-    public void updateData() {
-        updateLanguageData();
+
+
+    private void initLanguageData() {
+        log.info("Initializing Language data");
+        this.languageData = new ArrayList<>();
+        for (String namespace : this.namespaceList) {
+            try {
+                LanguageData data = fetchLanguageDataWithRetries(namespace, this.env, 10);
+                if (data != null) {
+                    this.languageData.add(data);
+                } else {
+                    log.error("Failed to fetch data for namespace: " + namespace + " after 10 retries.");
+                }
+            } catch (Exception e) {
+                log.error("Error initializing language data for namespace: " + namespace, e);
+            }
+        }
+        isInitialized = true;
     }
 
-    private void updateLanguageData(){
-        this.languageData = new ArrayList<>();
-        for(String namespace : this.namespaceList){
-            LanguageData languageData = new LanguageData(namespace , this.env);
-            this.languageData.add(languageData);
+    private LanguageData fetchLanguageDataWithRetries(String namespace, String env, int maxRetries) {
+        int attempt = 0;
+        while (attempt < maxRetries) {
+            try {
+                log.info("Attempt " + (attempt + 1) + " fetching for namespace : " + namespace  );
+                LanguageData result = new LanguageData(namespace, env);
+                log.info("Fetching " + namespace +  " Success !!!!!!!");
+                return result;
+            } catch (Exception e) {
+                log.error("Attempt " + (attempt + 1) + " failed for namespace: " + namespace);
+                attempt++;
+            }
+        }
+        return null;
+    }
+
+
+    @Scheduled(cron = "0 */10 * * * *")
+    public void updateData() {
+        if (!isInitialized) {
+            log.info("Initialization not complete. Skipping update.");
+            return; // Skip the update if initialization is not complete
+        }
+        log.info("Updating language data");
+        for (String namespace : this.namespaceList) {
+            log.info("-------- namespace : " + namespace +" -----------");
+            try {
+                LanguageData updatedLanguageData = fetchLanguageDataWithRetries(namespace, this.env, 10);
+                if (updatedLanguageData != null) {
+                    replaceLanguageDataForNamespace(namespace, updatedLanguageData);
+                    log.info("Successfully updated language data for namespace: " + namespace);
+                } else {
+                    log.error("Failed to update language data for namespace: " + namespace + " after 10 retries.");
+                }
+            } catch (Exception e) {
+                log.error("Failed to update language data for namespace: " + namespace, e);
+            }
+            log.info("-----------------------------------");
         }
     }
+
+    private void replaceLanguageDataForNamespace(String namespace, LanguageData newData) {
+        languageData.removeIf(ld -> ld.getNamespace().equals(namespace));  // Remove old data for the namespace
+        languageData.add(newData);  // Add the updated data
+    }
+
 }
