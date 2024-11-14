@@ -10,7 +10,7 @@
     </parent>
     <groupId>vn.kisvn.language</groupId>
     <artifactId>kisv-language</artifactId>
-    <version>0.1.10-SNAPSHOT</version>
+    <version>0.1.12-SNAPSHOT</version>
     <name>kisv-language-maven</name>
     <description>kisv-language-maven</description>
     <properties>

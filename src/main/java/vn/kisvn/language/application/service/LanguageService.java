@@ -73,6 +73,20 @@ public class LanguageService {
         return Collections.emptySet();
     }
 
+//    public void testResource(String namespace)  {
+//        log.info("test");
+//        try {
+//            LanguageData languageDataTest = new LanguageData(namespace);
+//            HashMap<String, String> langMap = languageDataTest.getValues().get(Lang.valueOf("en"));
+//            Set<String> output =  langMap.keySet();
+//            for(String t : output){
+//                log.info("t = " + t);
+//            }
+//        } catch (Exception e) {
+//            log.error(" e : " + e);
+//        }
+//    }
+
 
 
     private void initLanguageData() {
@@ -81,11 +95,12 @@ public class LanguageService {
         for (String namespace : this.namespaceList) {
             try {
                 LanguageData data = fetchLanguageDataWithRetries(namespace, this.env, 10);
-                if (data != null) {
-                    this.languageData.add(data);
-                } else {
-                    log.error("Failed to fetch data for namespace: " + namespace + " after 10 retries.");
+                if (data == null) {
+                    log.info("Failed to fetch data for namespace: " + namespace + " after 10 retries, attempting to load from local resources.");
+                    data = new LanguageData(namespace); // Fallback to local resources
+                    log.info("Success getting data from resources");
                 }
+                this.languageData.add(data);
             } catch (Exception e) {
                 log.error("Error initializing language data for namespace: " + namespace, e);
             }
@@ -109,6 +124,7 @@ public class LanguageService {
         return null;
     }
 
+    //    @Scheduled(cron = "0 */10 * * * *")
 
     @Scheduled(cron = "0 */10 * * * *")
     public void updateData() {
@@ -135,8 +151,9 @@ public class LanguageService {
     }
 
     private void replaceLanguageDataForNamespace(String namespace, LanguageData newData) {
+        System.out.println("languageData1 : " + languageData);
         languageData.removeIf(ld -> ld.getNamespace().equals(namespace));  // Remove old data for the namespace
         languageData.add(newData);  // Add the updated data
+        System.out.println("languageData2 : " + languageData);
     }
-
 }
